@@ -45,6 +45,18 @@ public class ToDo {
       } else {
         System.out.println("Too many arguments!");
       }
+    } else if (args[0].equals("-u")) {
+      if (args.length == 1) {
+        System.out.println("Unable to uncheck: no index provided");
+      } else if (args.length == 2) {
+        try {
+          uncheckTask(Integer.valueOf(args[1]));
+        } catch (NumberFormatException e) {
+          System.out.println("Unable to uncheck: index is not a number");
+        }
+      } else {
+        System.out.println("Too many arguments!");
+      }
     } else {
       System.out.println("Unsupported argument");
     }
@@ -81,8 +93,12 @@ public class ToDo {
 
   private static void addTask(String newTask) {
     List<String> listText = loadFile("data.csv");
-    String firstLineStart = listText.get(0).substring(0, 3);
-    listText.add(firstLineStart.equals("[ ]") || firstLineStart.equals("[x]") ? "[ ] " + newTask : newTask);
+    if (!listText.isEmpty()) {
+      String firstLineStart = listText.get(0).substring(0, 3);
+      listText.add(firstLineStart.equals("[ ]") || firstLineStart.equals("[x]") ? "[ ] " + newTask : newTask);
+    } else {
+      listText.add(newTask);
+    }
     Path newList = Paths.get("data.csv");
     try {
       Files.write(newList, listText);
@@ -121,9 +137,42 @@ public class ToDo {
           listText.set(i, "[x]" + thisLineText);
         } else if (!(thisLineStart.equals("[x]"))) {
           listText.set(i, "[x] " + thisLine);
+        } else if (thisLineStart.equals("[x]")) {
+          System.out.println("This task is already completed.");
         }
       } else if (!(thisLineStart.equals("[ ]") || thisLineStart.equals("[x]"))) {
         listText.set(i, "[ ] " + thisLine);
+      }
+    }
+
+    Path newList = Paths.get("data.csv");
+    try {
+      Files.write(newList, listText);
+    } catch (IOException e) {
+      System.out.println("Something is wrong with the file.");
+    }
+  }
+
+  private static void uncheckTask(int index) {
+    List<String> listText = loadFile("data.csv");
+    if (index > listText.size()) {
+      System.out.println("Unable to uncheck: index is out of bound");
+      return;
+    }
+    for (int i = 0; i < listText.size(); i++) {
+      String thisLine = listText.get(i);
+      String thisLineStart = thisLine.substring(0, 3);
+      String thisLineText = thisLine.substring(3);
+      if (i == index - 1) {
+        if (thisLineStart.equals("[x]")) {
+          listText.set(i, "[ ]" + thisLineText);
+        } else if (thisLineStart.equals("[ ]")) {
+          System.out.println("This task is already uncompleted.");
+        }
+      } else if (!(thisLineStart.equals("[ ]") || thisLineStart.equals("[x]"))) {
+        System.out.println("Can't uncheck, you must check something first! ");
+        break;
+
       }
     }
 
