@@ -128,14 +128,9 @@ public class ToDo {
     }
 
     Path newList = Paths.get("data.csv");
-    try
-
-    {
+    try {
       Files.write(newList, listText);
-    } catch (
-            IOException e)
-
-    {
+    } catch (IOException e) {
       System.out.println("Something is wrong with the file.");
     }
   }
