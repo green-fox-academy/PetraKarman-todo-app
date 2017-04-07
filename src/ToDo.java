@@ -45,6 +45,8 @@ public class ToDo {
       } else {
         System.out.println("Too many arguments!");
       }
+    } else {
+      System.out.println("Unsupported argument");
     }
   }
 
@@ -79,7 +81,8 @@ public class ToDo {
 
   private static void addTask(String newTask) {
     List<String> listText = loadFile("data.csv");
-    listText.add(newTask);
+    String firstLineStart = listText.get(0).substring(0, 3);
+    listText.add(firstLineStart.equals("[ ]") || firstLineStart.equals("[x]") ? "[ ] " + newTask : newTask);
     Path newList = Paths.get("data.csv");
     try {
       Files.write(newList, listText);
@@ -110,16 +113,29 @@ public class ToDo {
       return;
     }
     for (int i = 0; i < listText.size(); i++) {
+      String thisLine = listText.get(i);
+      String thisLineStart = thisLine.substring(0, 3);
+      String thisLineText = thisLine.substring(3);
       if (i == index - 1) {
-        listText.set(i, "[x] " + listText.get(i));
-      } else {
-        listText.set(i, "[ ] " + listText.get(i));
+        if (thisLineStart.equals("[ ]")) {
+          listText.set(i, "[x]" + thisLineText);
+        } else if (!(thisLineStart.equals("[x]"))) {
+          listText.set(i, "[x] " + thisLine);
+        }
+      } else if (!(thisLineStart.equals("[ ]") || thisLineStart.equals("[x]"))) {
+        listText.set(i, "[ ] " + thisLine);
       }
     }
+
     Path newList = Paths.get("data.csv");
-    try {
+    try
+
+    {
       Files.write(newList, listText);
-    } catch (IOException e) {
+    } catch (
+            IOException e)
+
+    {
       System.out.println("Something is wrong with the file.");
     }
   }
